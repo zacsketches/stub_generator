@@ -61,4 +61,13 @@ public:
 	bool ascending[KeyCount]
 };
 
+class No_Inline
+{
+	int data;
+	bool something;
+public:
+	get_action();
+private:
+	my_private_method();
+};
 #endif
