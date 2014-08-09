@@ -1,11 +1,19 @@
 #! /usr/bin/env python
 
+# Zac Staples on 9 Aug 2014
+# Lots to improve upon here, but it gets me started.
+# Some specific improvement would be to handle discriminators like static, and virtual
+# I also need to handle the double set of parens in an operator function
+# like this one:
+#   bool operator()(const int arg1, cont int arg2)
+
 import sys
 
 # conduct argument checking
-if(len(sys.argv) != 2):
-    print("Usage: genstubs.py <filename>")
-    print("\t<filename> must point to a c++ header file")
+if(len(sys.argv) < 2):
+    print("Usage: genstubs.py <in_filename> [<out_filename> = out.cpp]")
+    print("\t<in_filename> must point to a c++ header file")
+    print("\t<out_filename> is optional and is the filename genstubs will write to")
     sys.exit()
 
 # ensure the argument connects to a file that be opened
@@ -19,11 +27,11 @@ except IOError:
 #*                         DEBUG CONROL
 #************************************************************************
 DEBUG_FORWARD = 0
-DEBUG_MAIN = 1
+DEBUG_MAIN = 0
 DEBUG_LAST_LINE = 0
 DEBUG_SLICES = 0
 DEBUG_CALC_SLICES = 0
-DEBUG_HAS_INLINE = 1
+DEBUG_HAS_INLINE = 0
 
 #************************************************************************
 #*                         Basic Error Feedback
@@ -219,6 +227,7 @@ lines = fp.readlines()
 classes = {}
 class_inline_slices = {}
 class_search_slices = {}
+class_methods = {}
 
 # fill the classes dict with the class names and starting line numbers for
 # each class definition
@@ -231,7 +240,7 @@ for line in lines:
                 classes[class_name(words)] = line_number
     line_number = line_number + 1
 
-# iterate over each class and create a dictionary of method name: str_arguments
+# create a dictionary of slices for each class that may contain method names
 for key in classes:
     start_index = classes[key]
     end_index = class_end(start_index, lines)
@@ -243,27 +252,83 @@ for key in classes:
         key_search_slices = calc_search_slices(start_index, end_index, key_inline_slices)
         class_search_slices[key] = key_search_slices
     else:
-        class_search_slices[key] = (start_index, end_index)
+        class_search_slices[key] = [(start_index, end_index)]
+        
+# open the output file
+out_file = "out.cpp"
+if len(sys.argv)>2:
+    out_file = sys.argv[2]
+out = open(out_file, "w")
+
+out.write("// Generateed by "+str(sys.argv[0])+"\n")
+out.write("//      based on "+str(sys.argv[1])+"\n")
+out.write("\n")
+out.write("#include <"+sys.argv[1]+">\n")
+out.write("\n")
+    
+# iterate over each class dictionary and find each method.
+# each class is a dict key with tuples(return_type, method_name, arguments)
+for key in class_search_slices:
+    out.write("//************************************************************************\n")
+    out.write("//*                     CLASS "+key.upper()+"\n")
+    out.write("//************************************************************************\n")
+
+    if DEBUG_MAIN:
+        print "--------------------------------------"
+        print "searching " + str(key)
+        print class_search_slices[key]
+    for start, end in class_search_slices[key]:
+        if DEBUG_MAIN:
+            print "\t\tstart is " + str(start) + "\tend is " + str(end)
+        for line in lines[start : end]:
+            if '(' in line:
+                words = str.split(line)
+                constructor = words[0]
+                con_paren_index = constructor.find("(")
+                if con_paren_index != -1:
+                    # get the constructor name
+                    constructor = constructor[:con_paren_index]
+                    # get the constructor args
+                    open_paren_index = line.find("(")
+                    close_paren_index = line.find(")")
+                    con_args = line[open_paren_index+1 : close_paren_index]
+                    if DEBUG_MAIN:
+                        print "the constructor is: " + constructor
+                        print "the args are: " + con_args
+                    #write the constructor stub
+                    out.write(key+"::"+constructor+"("+con_args+")\n{")
+                    out.write("\n\t/* TODO: Implement "+key+" constructor */\n")
+                    out.write("}\n\n")
+                else:
+                    return_type = words[0]
+                    method = words[1]
+                    paren_index = method.find("(")
+                    method = method[:paren_index]
+                    # get the method args
+                    open_paren_index = line.find("(")
+                    close_paren_index = line.find(")")
+                    meth_args = line[open_paren_index+1 : close_paren_index]
+                    # check for a const; at the end of the declaration
+                    if words[-1] == "const;":
+                        modifier = "const"
+                    else:
+                        modifier = ""
+                        
+                    if DEBUG_MAIN:
+                        print(return_type, method, meth_args)
+    
+                    #write the method stub
+                    out.write(return_type+" "+key+"::"+method+"("+meth_args+") "+modifier+"\n")
+                    out.write("{\n")
+                    out.write("\t/* TODO: Implement "+method+" method */\n")
+                    out.write("}\n\n")
+
+print ("SUCCESS: Stub file written to "+out_file)
+    
     
 if DEBUG_MAIN: 
-    print(classes)
-    print(class_inline_slices)
-    print(class_search_slices)
+#    print(classes)
+#    print(class_inline_slices)
+#    print(class_search_slices)
 
-
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
+    val = "end"         

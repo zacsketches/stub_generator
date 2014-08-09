@@ -1,8 +1,0 @@
-rambling...slice the file from the opening and closing curly lines 
-if the line has length consider it:
-	if the line contains a '(' then concatenate from the start of the line 
-	until the first ';' if it not within an inline block.
-
-So I need a list of search zones for each slice that ignores the inline blocks
-
-class_xxx[(start, stop), (start, stop)...]

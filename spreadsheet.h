@@ -66,8 +66,8 @@ class No_Inline
 	int data;
 	bool something;
 public:
-	get_action();
+	void get_action();
 private:
-	my_private_method();
+	int my_private_method();
 };
 #endif
