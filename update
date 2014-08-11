@@ -1,3 +1,3 @@
 #! /bin/bash
-cp ./genstubs.py /Volumes/User_data/mybin/genstubs
-chmod +x /Volumes/User_data/mybin/genstubs
+
+ln -sf /Volumes/User_data/python_docs/genstubs/genstubs.py /Volumes/User_data/mybin/genstubs
