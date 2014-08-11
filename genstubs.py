@@ -9,13 +9,23 @@
 
 import sys
 
+# version
+version = 1.1
+
 # conduct argument checking
 if(len(sys.argv) < 2):
     print("Usage: genstubs.py <in_filename> [<out_filename> = out.cpp]")
     print("\t<in_filename> must point to a c++ header file")
     print("\t<out_filename> is optional and is the filename genstubs will write to")
+    print("Usage: genstubs.py --version")
     sys.exit()
 
+# check for a few flags
+flag = sys.argv[1]
+if flag=="--version":
+    print("genstubs version " + str(version))
+    sys.exit()
+    
 # ensure the argument connects to a file that be opened
 try:
     fp = open(sys.argv[1], 'r')
@@ -263,7 +273,7 @@ out = open(out_file, "w")
 out.write("// Generateed by "+str(sys.argv[0])+"\n")
 out.write("//      based on "+str(sys.argv[1])+"\n")
 out.write("\n")
-out.write("#include <"+sys.argv[1]+">\n")
+out.write("#include \""+sys.argv[1]+"\"\n")
 out.write("\n")
     
 # iterate over each class dictionary and find each method.
@@ -327,8 +337,6 @@ print ("SUCCESS: Stub file written to "+out_file)
     
     
 if DEBUG_MAIN: 
-#    print(classes)
-#    print(class_inline_slices)
-#    print(class_search_slices)
-
-    val = "end"         
+    print(classes)
+    print(class_inline_slices)
+    print(class_search_slices)
