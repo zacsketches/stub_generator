@@ -44,6 +44,7 @@ DEBUG_LAST_LINE = 0
 DEBUG_SLICES = 0
 DEBUG_CALC_SLICES = 0
 DEBUG_HAS_INLINE = 0
+DEBUG_COMMENT = 0
 
 #************************************************************************
 #*                         Basic Error Feedback
@@ -233,6 +234,23 @@ def has_inline_slices(start_index, end_index, lines):
     return has_inlines
 
 #************************************************************************
+#*                         NOT_A_COMMENT
+#************************************************************************
+def not_a_comment(line):
+    #return true if the line is not a comment
+    result = True
+    
+    first_two_chars = line.lstrip()
+    first_two_chars = first_two_chars[:2]
+    if DEBUG_COMMENT:
+        print("First two chars are: "+first_two_chars)
+    if first_two_chars == "//":
+        result = False
+    
+    return result
+
+
+#************************************************************************
 #*                         MAIN
 #************************************************************************
 lines = fp.readlines()
@@ -293,7 +311,7 @@ for key in class_search_slices:
         if DEBUG_MAIN:
             print "\t\tstart is " + str(start) + "\tend is " + str(end)
         for line in lines[start : end]:
-            if '(' in line:
+            if '(' in line and not_a_comment(line):
                 words = str.split(line)
                 constructor = words[0]
                 con_paren_index = constructor.find("(")
