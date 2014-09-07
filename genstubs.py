@@ -1,6 +1,8 @@
 #! /usr/bin/env python
 
 # Zac Staples on 9 Aug 2014
+# A basic script to convert the headers of a .h file into a .cpp file
+
 # Lots to improve upon here, but it gets me started.
 # Some specific improvement would be to handle discriminators like static, and virtual
 # I also need to handle the double set of parens in an operator function
@@ -270,8 +272,8 @@ if len(sys.argv)>2:
     out_file = sys.argv[2]
 out = open(out_file, "w")
 
-out.write("// Generateed by "+str(sys.argv[0])+"\n")
-out.write("//      based on "+str(sys.argv[1])+"\n")
+out.write("// Generateed by "+str(sys.argv[0])+" Version "+str(version)+"\n")
+#out.write("//      based on "+str(sys.argv[1])+"\n")
 out.write("\n")
 out.write("#include \""+sys.argv[1]+"\"\n")
 out.write("\n")
