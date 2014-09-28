@@ -285,10 +285,17 @@ for key in classes:
         class_search_slices[key] = [(start_index, end_index)]
         
 # open the output file
-out_file = "out.cpp"
+out_file = sys.argv[1]
+out_file = out_file.partition(".") #divides into a three part tuple
+out_file = out_file[0]
+out_file = out_file + ".cpp"
 if len(sys.argv)>2:
-    out_file = sys.argv[2]
-out = open(out_file, "w")
+    out_file = sys.argv[2].rstrip()
+try:
+    out = open(out_file, 'w')
+except IOError:
+    print("Error: unable to open file " + out_file)
+    sys.exit()
 
 out.write("// Generateed by "+str(sys.argv[0])+" Version "+str(version)+"\n")
 #out.write("//      based on "+str(sys.argv[1])+"\n")
