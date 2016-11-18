@@ -4,10 +4,19 @@
 # A basic script to convert the headers of a .h file into a .cpp file
 
 # Lots to improve upon here, but it gets me started.
-# Some specific improvement would be to handle discriminators like static, and virtual
-# I also need to handle the double set of parens in an operator function
+# Some specific improvement would be to:
+# 1. Handle discriminators like static, and virtual
+# 2. I also need to handle the double set of parens in an operator function
 # like this one:
 #   bool operator()(const int arg1, cont int arg2)
+# 3. In Qt I don't want to build implementations in the .cpp file for signals
+# bcecause the moc will duplicate those signals and create linker errors when
+# it expands the Q_OBjECT.  Perhaps an easy notification would be possible at this
+# point to notify the user that the input contained `Signals:` and that the
+# resulting .cpp file should be edited to take those stubs out.
+# 4. Doesn't handle header files with Q_PROPERTY macros.
+# 5. Needs to strip default values out of the argument list in the .cpp files it
+# processes.
 
 import sys
 
@@ -28,7 +37,7 @@ if flag=="--version":
     print("genstubs version " + str(version))
     sys.exit()
     
-# ensure the argument connects to a file that be opened
+# ensure the argument connects to a file that can be opened
 try:
     fp = open(sys.argv[1], 'r')
 except IOError:
@@ -67,7 +76,7 @@ def forward_declaration(words):
         print("the last word in the line is: " + last_word)
         print("the last char in the word is: " + last_word[-1])
 
-    # only the forward declaration has a semi-colon as the last symbol of
+    # Usually the forward declaration has a semi-colon as the last symbol of
     # the last word
     if last_word[-1] == ';':
         result = True
@@ -95,7 +104,7 @@ def class_name(words):
 #*                         Find the last line of the class
 #************************************************************************
 def class_end(start_index, lines):
-    # argument is the line number of the first line in the class and the
+    # arguments are the line number of the first line in the class and the
     # List of lines in the file
     # if we start scanning at this point we should find the first '{'
     # right around there and then a closing '}' at some point later.
